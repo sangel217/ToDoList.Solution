@@ -7,27 +7,6 @@ namespace ToDoList.Controllers
   public class ItemsController : Controller
   {
 
-    [HttpGet("/items")]
-    public ActionResult Index()
-    {
-      List<Item> allItems = Item.GetAll();
-      return View(allItems);
-    }
-
-    [HttpGet("/items/new")]
-    public ActionResult New()
-    {
-      return View();
-    }
-
-    [HttpPost("/items")]
-    public ActionResult Create(string description)
-    {
-      Item myItem = new Item(description);
-      return RedirectToAction("Index");
-    }
-
-
     [HttpPost("/items/delete")]
     public ActionResult DeleteAll()
     {
@@ -35,12 +14,24 @@ namespace ToDoList.Controllers
       return View();
     }
 
-    [HttpGet("/items/{id}")]
-   public ActionResult Show(int id)
-   {
-     Item item = Item.Find(id);
-     return View(item);
-   }
+   [HttpGet("/categories/{categoryId}/items/{itemId}")]
+    public ActionResult Show(int categoryId, int itemId)
+    {
+      Item item = Item.Find(itemId);
+      Dictionary<string, object> model = new Dictionary<string, object>();
+      Category category = Category.Find(categoryId);
+      model.Add("item", item);
+      model.Add("category", category);
+      return View(model);
+    }
+
+    [HttpGet("/categories/{categoryId}/items/new")]
+    public ActionResult New(int categoryId)
+    {
+       Category category = Category.Find(categoryId);
+       return View(category);
+    }
+
 
 
   }
