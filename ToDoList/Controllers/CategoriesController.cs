@@ -3,6 +3,7 @@ using System;
 using Microsoft.AspNetCore.Mvc;
 using ToDoList.Models;
 
+
 namespace ToDoList.Controllers
 {
   public class CategoriesController : Controller
@@ -41,11 +42,11 @@ namespace ToDoList.Controllers
 
     // This one creates new Items within a given Category, not new Categories:
     [HttpPost("/categories/{categoryId}/items")]
-     public ActionResult Create(int categoryId, string itemDescription)
+     public ActionResult Create(int categoryId, string itemDescription, DateTime itemDue)
      {
        Dictionary<string, object> model = new Dictionary<string, object>();
        Category foundCategory = Category.Find(categoryId);
-       Item newItem = new Item(itemDescription);
+       Item newItem = new Item(itemDescription, itemDue);
        newItem.Save();
        foundCategory.AddItem(newItem);
        List<Item> categoryItems = foundCategory.GetItems();

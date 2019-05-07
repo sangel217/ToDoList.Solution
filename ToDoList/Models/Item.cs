@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using MySql.Data.MySqlClient;
+using System;
 
 namespace ToDoList.Models
 {
@@ -7,12 +8,14 @@ namespace ToDoList.Models
   {
     private string _description;
     private int _id;
+    private DateTime _due;
     //private static List<Item> _instances = new List<Item> {};
 
-    public Item(string description, int id = 0)
+    public Item(string description, DateTime due, int id = 0)
     {
       _description = description;
       _id = id;
+      _due = due;
     }
 
     public string GetDescription()
@@ -30,6 +33,16 @@ namespace ToDoList.Models
       return _id;
     }
 
+    public DateTime GetDue()
+    {
+      return _due;
+    }
+
+    public void SetDue(DateTime newDue)
+    {
+      _due = newDue;
+    }
+
     public static List<Item> GetAll()
     {
       List<Item> allItems = new List<Item> { };
@@ -43,7 +56,8 @@ namespace ToDoList.Models
       {
         int itemId = rdr.GetInt32(0);
         string itemDescription = rdr.GetString(1);
-        Item newItem = new Item(itemDescription, itemId);
+        DateTime itemDue = rdr.GetDateTime(2);
+        Item newItem = new Item(itemDescription, itemDue, itemId);
         allItems.Add(newItem);
       }
 
@@ -84,12 +98,14 @@ namespace ToDoList.Models
       var rdr = cmd.ExecuteReader() as MySqlDataReader;
       int itemId = 0;
       string itemDescription = "";
+      DateTime itemDue = new DateTime();
       while (rdr.Read())
       {
          itemId = rdr.GetInt32(0);
          itemDescription = rdr.GetString(1);
+         itemDue = rdr.GetDateTime(2);
       }
-      Item foundItem= new Item(itemDescription, itemId);
+      Item foundItem = new Item(itemDescription, itemDue, itemId);
        conn.Close();
        if (conn != null)
        {
@@ -123,6 +139,10 @@ namespace ToDoList.Models
       description.ParameterName = "@ItemDescription";
       description.Value = this._description;
       cmd.Parameters.Add(description);
+      MySqlParameter due = new MySqlParameter();
+      due.ParameterName = "@ItemDue";
+      due.Value = this._due;
+      cmd.Parameters.Add(due);
       cmd.ExecuteNonQuery();
       _id = (int) cmd.LastInsertedId;
       conn.Close();
