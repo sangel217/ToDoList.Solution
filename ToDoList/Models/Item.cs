@@ -7,11 +7,13 @@ namespace ToDoList.Models
   {
     private string _description;
     private int _id;
+    private int _categoryId;
     //private static List<Item> _instances = new List<Item> {};
 
-    public Item(string description, int id = 0)
+    public Item(string description, int categoryId, int id = 0)
     {
       _description = description;
+      _categoryId =  categoryId;
       _id = id;
     }
 
@@ -28,6 +30,11 @@ namespace ToDoList.Models
     public int GetId()
     {
       return _id;
+    }
+
+    public int GetCategoryId()
+    {
+      return _categoryId;
     }
 
     public static List<Item> GetAll()
@@ -125,6 +132,29 @@ namespace ToDoList.Models
       cmd.Parameters.Add(description);
       cmd.ExecuteNonQuery();
       _id = (int) cmd.LastInsertedId;
+      conn.Close();
+      if (conn != null)
+      {
+        conn.Dispose();
+      }
+    }
+
+    public void Edit(string newDescription)
+    {
+      MySqlConnection conn = DB.Connection();
+      conn.Open();
+      var cmd = conn.CreateCommand() as MySqlCommand;
+      cmd.CommandText = @"UPDATE items SET description = @newDescription WHERE id = @searchId;";
+      MySqlParameter searchId = new MySqlParameter();
+      searchId.ParameterName = "@searchId";
+      searchId.Value = _id;
+      cmd.Parameters.Add(searchId);
+      MySqlParameter description = new MySqlParameter();
+      description.ParameterName = "@newDescription";
+      description.Value = newDescription;
+      cmd.Parameters.Add(description);
+      cmd.ExecuteNonQuery();
+      _description = newDescription;
       conn.Close();
       if (conn != null)
       {
